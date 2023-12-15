@@ -3,9 +3,9 @@
 This is a simple task list app built with Flutter. The app allows users to create, manage, and delete tasks.
 Login Page => you can access to it with this credentials :
 
-Username:sameh
+Username: sameh
 
-Password:123456
+Password: 123456
 
 ## Features
 

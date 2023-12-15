@@ -38,6 +38,6 @@ To run this app on your local machine, follow these steps:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/sameh-yasuo/TaskApp.git
+git clone https://github.com/sameh-yasuo/TaskListApp.git
 cd taskapp
 

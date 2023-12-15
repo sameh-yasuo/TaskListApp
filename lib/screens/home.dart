@@ -3,7 +3,7 @@ import '../model/todo.dart';
 import '../widgets/todo_item.dart';
 import '../services/api_service.dart';
 import '../screens/login.dart';
-import '../screens/add_todo_page.dart'; // Import AddTodoPage
+import '../screens/add_todo_page.dart';
 
 class Home extends StatefulWidget {
   final ApiService apiService;
@@ -19,8 +19,15 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    _todos = widget.apiService.fetchTodos();
+    _fetchTodos(); // Fetch todos when the widget is initialized
     super.initState();
+  }
+
+  Future<void> _fetchTodos() async {
+    setState(() {
+      // Refresh the todo list by fetching from the API
+      _todos = widget.apiService.fetchTodos();
+    });
   }
 
   @override
@@ -56,10 +63,10 @@ class _HomeState extends State<Home> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _navigateToAddTodoPage(context);
+          _navigateToAddTodoPage(context); // Navigate to AddTodoPage
         },
         child: Icon(Icons.add),
-        backgroundColor: Colors.blue, // Set the background color to blue
+        backgroundColor: Colors.blue, // Set the button color to blue
       ),
     );
   }
@@ -108,9 +115,7 @@ class _HomeState extends State<Home> {
       await widget.apiService.updateTodo(todo);
       print('Todo updated successfully.');
       // Refresh the todo list after updating
-      setState(() {
-        _todos = widget.apiService.fetchTodos();
-      });
+      _fetchTodos();
     } catch (error) {
       print('Error updating todo: $error');
     }
@@ -122,10 +127,9 @@ class _HomeState extends State<Home> {
         print('Deleting todo with ID: $id');
         await widget.apiService.deleteTodo(id);
         print('Todo deleted successfully.');
-        // Refresh the todo list after deletion
-        setState(() {
-          _todos = widget.apiService.fetchTodos();
-        });
+
+        // Fetch updated todos after deletion
+        _fetchTodos();
       } catch (error) {
         print('Error deleting todo: $error');
       }

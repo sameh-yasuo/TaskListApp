@@ -13,7 +13,7 @@ class ApiService {
 
     if (response.statusCode == 200) {
       List<dynamic> todosJson = json.decode(response.body);
-      List<Todo> todos = todosJson.map((json) => Todo.fromJson(json)).toList();
+      List<Todo> todos = createTodoListFromApi(todosJson);
       return todos;
     } else {
       throw Exception('Failed to load todos');
@@ -54,7 +54,7 @@ class ApiService {
     }
   }
 
-  Future<void> deleteTodo(String id) async {
+  Future<void> deleteTodo(int id) async {
     try {
       print('Deleting todo with ID: $id');
       final response = await http.delete(Uri.parse('$apiUrl/$id'));

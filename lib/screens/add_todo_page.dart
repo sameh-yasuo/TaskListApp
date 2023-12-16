@@ -49,6 +49,15 @@ class _AddTodoPageState extends State<AddTodoPage> {
         Todo newTodo = Todo(title: title);
         await widget.apiService.addTodo(newTodo);
 
+        // Show a snackbar to indicate successful addition
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('New task added successfully'),
+            duration: Duration(seconds: 2),
+            backgroundColor: Colors.green,
+          ),
+        );
+
         // Navigate back to the home page after adding the todo
         Navigator.pop(context);
       } catch (error) {

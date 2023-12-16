@@ -24,10 +24,29 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> _fetchTodos() async {
-    setState(() {
-      // Refresh the todo list by fetching from the API
-      _todos = widget.apiService.fetchTodos();
-    });
+    try {
+      setState(() {
+        _todos = widget.apiService.fetchTodos();
+      });
+    } catch (error) {
+      print('Error fetching todos: $error');
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text('Failed to fetch todos. Please try again.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
@@ -41,8 +60,11 @@ class _HomeState extends State<Home> {
             return CircularProgressIndicator();
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
+          } else if (snapshot.data == null ||
+              (snapshot.data as List<Todo>).isEmpty) {
+            return Text('No todos available.');
           } else {
-            List<Todo> todos = snapshot.data!;
+            List<Todo> todos = snapshot.data as List<Todo>;
             return ListView.builder(
               itemCount: todos.length,
               itemBuilder: (context, index) {
@@ -66,7 +88,7 @@ class _HomeState extends State<Home> {
           _navigateToAddTodoPage(context); // Navigate to AddTodoPage
         },
         child: Icon(Icons.add),
-        backgroundColor: Colors.blue, // Set the button color to blue
+        backgroundColor: Colors.blue, // Set the background color
       ),
     );
   }
@@ -109,29 +131,72 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Future<void> _handleToDoChange(Todo todo) async {
+  Future<void> _handleToDoChange(Todo updatedTodo) async {
     try {
-      print('Updating todo: $todo');
-      await widget.apiService.updateTodo(todo);
+      print('Updating todo: $updatedTodo');
+      await widget.apiService.updateTodo(updatedTodo);
       print('Todo updated successfully.');
-      // Refresh the todo list after updating
+
+      // Fetch updated todos after updating
       _fetchTodos();
     } catch (error) {
       print('Error updating todo: $error');
+      // Display an error message to the user, similar to the fetching error.
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text('Failed to update todo. Please try again.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
     }
   }
 
-  Future<void> _deleteToDoItem(String id) async {
-    if (id.isNotEmpty) {
+  Future<void> _deleteToDoItem(int id) async {
+    if (id != 0) {
       try {
         print('Deleting todo with ID: $id');
         await widget.apiService.deleteTodo(id);
         print('Todo deleted successfully.');
+        //refrelching the list after delete an item**************
+        List<Todo> todos = await _todos;
+        setState(() {
+          _todos = Future.value(todos.where((todo) => todo.id != id).toList());
+        });
 
-        // Fetch updated todos after deletion
-        _fetchTodos();
+        // Show a snackbar to indicate successful deletion
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Todo deleted successfully'),
+              duration: Duration(seconds: 2),
+              backgroundColor: Colors.green),
+        );
       } catch (error) {
         print('Error deleting todo: $error');
+        // Display an error message to the user, similar to the fetching error.
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Error'),
+            content: Text('Failed to delete todo. Please try again.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the dialog
+                },
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        );
       }
     }
   }

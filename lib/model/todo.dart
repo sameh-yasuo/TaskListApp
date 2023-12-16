@@ -1,6 +1,6 @@
 class Todo {
   int? userId;
-  String? id;
+  int? id;
   String? title;
   bool? completed = true;
 
@@ -13,7 +13,7 @@ class Todo {
 
   Todo.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];
-    id = json['id'].toString(); // Convert to string
+    id = json['id']; // Convert to string
     title = json['title'];
     completed = json['completed'];
   }

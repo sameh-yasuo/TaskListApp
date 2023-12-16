@@ -5,7 +5,7 @@ import '../constants/colors.dart';
 class ToDoItem extends StatelessWidget {
   final Todo todo;
   final Function(Todo) onToDoChanged;
-  final Function(String) onDeleteItem;
+  final Function(int) onDeleteItem;
 
   const ToDoItem({
     Key? key,
@@ -13,6 +13,14 @@ class ToDoItem extends StatelessWidget {
     required this.onToDoChanged,
     required this.onDeleteItem,
   }) : super(key: key);
+  void _toggleCompleted() {
+    Todo updatedTodo = Todo(
+      id: todo.id,
+      title: todo.title,
+      completed: !(todo.completed ?? false),
+    );
+    onToDoChanged(updatedTodo);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,16 +28,21 @@ class ToDoItem extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 20),
       child: ListTile(
         onTap: () {
-          onToDoChanged(todo);
+          _toggleCompleted();
         },
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
         tileColor: Colors.white,
-        leading: Icon(
-          todo.completed! ? Icons.check_box : Icons.check_box_outline_blank,
-          color: tdBlue,
+        leading: IconButton(
+          icon: Icon(
+            todo.completed ?? false
+                ? Icons.check_box
+                : Icons.check_box_outline_blank,
+            color: tdBlue,
+          ),
+          onPressed: _toggleCompleted,
         ),
         title: Text(
           todo.title!,
